@@ -1,13 +1,13 @@
-package com.crowtech.awsProject01;
+package com.crowtech.projectAWS01;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AwsProject01Application {
+public class ProjectAws01Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AwsProject01Application.class, args);
+		SpringApplication.run(ProjectAws01Application.class, args);
 	}
 
 }
