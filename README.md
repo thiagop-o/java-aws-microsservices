@@ -10,7 +10,7 @@ Docker Hub;
 Conta na AWS;
 AWS CLI;
 AWS CDK;
-JDK 11+;
+JDK 15+;
 IDE de sua escolha(Utilizo IntelliJ);
 MySQL Workbench
 Postman
@@ -22,6 +22,30 @@ Postman
 
 ```
 cdk init app --language java
+```
+
+<p>Fazendo deployment da configuração da VPC:</p>
+
+```
+cdk deploy Vpc
+```
+
+<p>Fazendo deployment da configuração do Cluster:</p>
+
+```
+cdk deploy Vpc Cluster
+```
+
+<p>Fazendo deployment da configuração do Service:</p>
+
+```
+cdk deploy Vpc Cluster Service01
+```
+
+<p>Destruindo os serviços criados na AWS:</p>
+
+```
+cdk destroy Vpc Cluster Service01
 ```
 
 <hr>

@@ -1,4 +1,4 @@
-package com.crowtech.awsProject01.controllers;
+package com.crowtech.projectAWS01.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,13 @@ public class TestController {
 
     @GetMapping("/dog/{name}")
     public ResponseEntity<?> dogTest(@PathVariable String name){
+        LOG.info("Test Controller - name: {}", name);
+
+        return ResponseEntity.ok("Nome: " + name);
+    }
+
+    @GetMapping("/cat/{name}")
+    public ResponseEntity<?> catTest(@PathVariable String name){
         LOG.info("Test Controller - name: {}", name);
 
         return ResponseEntity.ok("Nome: " + name);

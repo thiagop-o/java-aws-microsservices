@@ -27,7 +27,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 bootJar {
 	baseName = 'java-aws-microsservices01'
-	version = '1.0.0'
+	version = '1.0.1'
 }
 
 task unpack(type: Copy){
