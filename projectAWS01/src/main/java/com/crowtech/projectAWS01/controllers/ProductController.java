@@ -1,7 +1,9 @@
 package com.crowtech.projectAWS01.controllers;
 
+import com.crowtech.projectAWS01.enums.EventType;
 import com.crowtech.projectAWS01.models.Product;
 import com.crowtech.projectAWS01.repositories.ProductRepository;
+import com.crowtech.projectAWS01.services.ProductPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +15,12 @@ import java.util.Optional;
 @RequestMapping("/api/products")
 public class ProductController {
     private ProductRepository productRepository;
+    private ProductPublisher productPublisher;
 
     @Autowired
-    public ProductController(ProductRepository productRepository) {
+    public ProductController(ProductRepository productRepository, ProductPublisher productPublisher) {
         this.productRepository = productRepository;
+        this.productPublisher = productPublisher;
     }
 
     @GetMapping
@@ -35,6 +39,7 @@ public class ProductController {
     public ResponseEntity<Product> saveProduct(@RequestBody Product product){
         Product productCreated = productRepository.save(product);
 
+        productPublisher.publishProductEvent(productCreated, EventType.PRODUCT_CREATED, "joao");
         return new ResponseEntity<Product>(productCreated, HttpStatus.CREATED);
     }
 
@@ -45,6 +50,7 @@ public class ProductController {
 
             Product productUpdated = productRepository.save(product);
 
+            productPublisher.publishProductEvent(productUpdated, EventType.PRODUCT_UPDATED, "Thiago");
             return new ResponseEntity<Product>(productUpdated , HttpStatus.OK);
         }else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -57,6 +63,7 @@ public class ProductController {
         if (optionalProduct.isPresent()){
             Product product = optionalProduct.get();
             productRepository.delete(product);
+            productPublisher.publishProductEvent(product, EventType.PRODUCT_DELETED, "hannah");
             return new ResponseEntity<Product>(product, HttpStatus.OK);
         }else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

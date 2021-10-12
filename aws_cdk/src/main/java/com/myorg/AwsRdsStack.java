@@ -17,7 +17,7 @@ public class AwsRdsStack extends Stack {
         super(scope, id, props);
 
         // The code that defines your stack goes here
-        CfnParameter databasePass = CfnParameter.Builder.create(this,"dbPassword")
+        CfnParameter databasePass = CfnParameter.Builder.create(this,"databasePassword")
                 .type("String")
                 .description("The RDS instance password")
                 .build();
@@ -29,14 +29,14 @@ public class AwsRdsStack extends Stack {
                 .create(this, "Rds01")
                 .instanceIdentifier("aws-project01-db")
                 .engine(DatabaseInstanceEngine.mysql(MySqlInstanceEngineProps.builder()
-                                .version(MysqlEngineVersion.VER_5_7_34)
+                        .version(MysqlEngineVersion.VER_5_7_34)
                         .build()))
                 .vpc(vpc)
-                .credentials(Credentials.fromPassword("admin", SecretValue.plainText(databasePass.getValueAsString())))
+                .credentials(/*Credentials.fromPassword("admin", SecretValue.plainText(databasePass.getValueAsString())))*/
 
-                        /*Credentials.fromUsername("admin", CredentialsFromUsernameOptions.builder()
-                        .password(SecretValue.plainText(databasePass.getValueAsString()))*/
-                        //.build()//))
+                        Credentials.fromUsername("admin", CredentialsFromUsernameOptions.builder()
+                        .password(SecretValue.plainText(databasePass.getValueAsString()))
+                        .build()))
                 .instanceType(InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.MICRO))
                 .multiAz(false)
                 .allocatedStorage(10)

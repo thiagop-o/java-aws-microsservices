@@ -1,10 +1,6 @@
 package com.myorg;
 
 import software.amazon.awscdk.core.App;
-import software.amazon.awscdk.core.Environment;
-import software.amazon.awscdk.core.StackProps;
-
-import java.util.Arrays;
 
 public class AwsCdkApp {
     public static void main(final String[] args) {
@@ -19,9 +15,17 @@ public class AwsCdkApp {
         AwsRdsStack awsRdsStack = new AwsRdsStack(app, "Rds", awsVpcStack.getVpc());
         awsRdsStack.addDependency(awsVpcStack);
 
-        AwsService01Stack awsService01Stack = new AwsService01Stack(app, "Service01", awsClusterStack.getCluster());
+        AwsSnsStack awsSnsStack = new AwsSnsStack(app,"Sns");
+
+        AwsService01Stack awsService01Stack = new AwsService01Stack(app, "Service01", awsClusterStack.getCluster(), awsSnsStack.getSnsTopic());
         awsService01Stack.addDependency(awsClusterStack);
         awsService01Stack.addDependency(awsRdsStack);
+        awsService01Stack.addDependency(awsSnsStack);
+
+        AwsService02Stack awsService02Stack = new AwsService02Stack(app, "Service02", awsClusterStack.getCluster());
+        awsService02Stack.addDependency(awsClusterStack);
+
+
 
 
 

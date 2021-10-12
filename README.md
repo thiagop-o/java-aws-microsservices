@@ -45,13 +45,13 @@ cdk deploy Vpc Cluster Service01
 <p>Fazendo deployment da configuração do Service com RDS:</p>
 
 ```
-cdk deploy --parameters Rds:dbpassword=mysql123 Vpc Cluster Rds Service01
+cdk deploy --parameters Rds:databasePassword=mysql123 Vpc Cluster Rds Sns Service01
 ```
 
 <p>Destruindo os serviços criados na AWS:</p>
 
 ```
-cdk destroy Vpc Cluster Service01
+cdk destroy Vpc Cluster Rds Service01
 ```
 
 <hr>

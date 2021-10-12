@@ -16,7 +16,7 @@ public class AwsClusterStack extends Stack {
         super(scope, id, props);
 
         // The code that defines your stack goes here
-        cluster = Cluster.Builder.create(this,id)
+        this.cluster = Cluster.Builder.create(this, id)
                 .clusterName("cluster-01")
                 .vpc(vpc)
                 .build();
