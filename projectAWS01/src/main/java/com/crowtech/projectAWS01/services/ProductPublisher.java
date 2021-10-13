@@ -1,6 +1,7 @@
 package com.crowtech.projectAWS01.services;
 
 import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.amazonaws.services.sns.model.Topic;
 import com.crowtech.projectAWS01.enums.EventType;
 import com.crowtech.projectAWS01.models.Envelope;
@@ -43,6 +44,17 @@ public class ProductPublisher {
                     productEventsTopic.getTopicArn(),
                     objectMapper.writeValueAsString(envelope)
             );
+
+            PublishResult publishResult = sns.publish(
+                    productEventsTopic.getTopicArn(),
+                    objectMapper.writeValueAsString(envelope)
+            );
+
+            LOG.info("Product event sent - Event: {} - ProductId: {} - MessageId: {}",
+                    envelope.getEventType(),
+                    productEvent.getProductId(),
+                    publishResult.getMessageId());
+
         } catch (JsonProcessingException e) {
             LOG.error("Failed to create product event message");
         }

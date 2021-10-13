@@ -22,8 +22,12 @@ public class AwsCdkApp {
         awsService01Stack.addDependency(awsRdsStack);
         awsService01Stack.addDependency(awsSnsStack);
 
-        AwsService02Stack awsService02Stack = new AwsService02Stack(app, "Service02", awsClusterStack.getCluster());
+        AwsDynamoStack awsDynamoStack = new AwsDynamoStack(app, "Dynamo01");
+
+        AwsService02Stack awsService02Stack = new AwsService02Stack(app, "Service02", awsClusterStack.getCluster(), awsSnsStack.getSnsTopic());
         awsService02Stack.addDependency(awsClusterStack);
+        awsService02Stack.addDependency(awsSnsStack);
+        awsService02Stack.addDependency(awsDynamoStack);
 
 
 

@@ -16,7 +16,7 @@ public class AwsVpcStack extends Stack {
 
         // The code that defines your stack goes here
         vpc = Vpc.Builder.create(this,"Vpc01")
-                .maxAzs(3)
+                .maxAzs(4)
                 .build();
     }
 

@@ -8,18 +8,42 @@ import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskI
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.events.targets.SnsTopic;
 import software.amazon.awscdk.services.logs.LogGroup;
+import software.amazon.awscdk.services.sns.subscriptions.SqsSubscription;
+import software.amazon.awscdk.services.sqs.DeadLetterQueue;
+import software.amazon.awscdk.services.sqs.Queue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class AwsService02Stack extends Stack {
-    public AwsService02Stack(final Construct scope, final String id, Cluster cluster) {
-        this(scope, id, null, cluster);
+    public AwsService02Stack(final Construct scope, final String id, Cluster cluster, SnsTopic snsTopic) {
+        this(scope, id, null, cluster,snsTopic);
     }
 
-    public AwsService02Stack(final Construct scope, final String id, final StackProps props, Cluster cluster) {
+    public AwsService02Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic snsTopic) {
         super(scope, id, props);
 
+        Queue productEventsDql = Queue.Builder.create(this, "ProductEventsDql")
+                .queueName("product-events-dql")
+                .build();
+
+        DeadLetterQueue deadLetterQueue = DeadLetterQueue.builder()
+                .queue(productEventsDql)
+                .maxReceiveCount(3)
+                .build();
+
+        Queue productEventsQueue = Queue.Builder.create(this, "ProductEvents")
+                .queueName("product-events")
+                .deadLetterQueue(deadLetterQueue)
+                .build();
+
+        SqsSubscription sqsSubscription = SqsSubscription.Builder.create(productEventsQueue).build();
+        snsTopic.getTopic().addSubscription(sqsSubscription);
+
+        Map<String, String> envVariables = new HashMap<>();
+        envVariables.put("AWS_REGION", "sa-east-1");
+        envVariables.put("AWS_SQS_QUEUE_PRODUCT_EVENTS_NAME", productEventsQueue.getQueueName());
 
 
         // The code that defines your stack goes here
@@ -28,12 +52,12 @@ public class AwsService02Stack extends Stack {
                 .cluster(cluster)
                 .cpu(512)
                 .memoryLimitMiB(1024)
-                .desiredCount(2)
+                .desiredCount(1)
                 .listenerPort(9090)
                 .taskImageOptions(
                         ApplicationLoadBalancedTaskImageOptions.builder()
                                 .containerName("java-aws-microsservices02")
-                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices02:1.1.0"))
+                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices02:1.3.0"))
                                 .containerPort(9090)
                                 .logDriver(LogDriver.awsLogs(AwsLogDriverProps.builder()
                                         .logGroup(LogGroup.Builder.create(this,"Service02LogGroup")
@@ -42,7 +66,7 @@ public class AwsService02Stack extends Stack {
                                                 .build())
                                         .streamPrefix("Service02")
                                         .build()))
-                                //.environment(envVariables)
+                                .environment(envVariables)
                                 .build())
                 .publicLoadBalancer(true)
                 .build();
@@ -54,8 +78,8 @@ public class AwsService02Stack extends Stack {
                 .build());
 
         ScalableTaskCount scalableTaskCount = service02.getService().autoScaleTaskCount(EnableScalingProps.builder()
-                .minCapacity(2)
-                .maxCapacity(4)
+                .minCapacity(1)
+                .maxCapacity(2)
                 .build());
 
         scalableTaskCount.scaleOnCpuUtilization("Service02AutoScaling", CpuUtilizationScalingProps.builder()
@@ -64,6 +88,7 @@ public class AwsService02Stack extends Stack {
                 .scaleOutCooldown(Duration.seconds(60))
                 .build());
 
+        productEventsQueue.grantConsumeMessages(service02.getTaskDefinition().getTaskRole());
 
     }
 }
