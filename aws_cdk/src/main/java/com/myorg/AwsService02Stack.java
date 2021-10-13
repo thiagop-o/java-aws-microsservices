@@ -2,6 +2,7 @@ package com.myorg;
 
 import software.amazon.awscdk.core.*;
 import software.amazon.awscdk.services.applicationautoscaling.EnableScalingProps;
+import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.ecs.*;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskImageOptions;
@@ -17,11 +18,11 @@ import java.util.Map;
 
 
 public class AwsService02Stack extends Stack {
-    public AwsService02Stack(final Construct scope, final String id, Cluster cluster, SnsTopic snsTopic) {
-        this(scope, id, null, cluster,snsTopic);
+    public AwsService02Stack(final Construct scope, final String id, Cluster cluster, SnsTopic snsTopic, Table productEventsDbd) {
+        this(scope, id, null, cluster, snsTopic, productEventsDbd);
     }
 
-    public AwsService02Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic snsTopic) {
+    public AwsService02Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic snsTopic, Table productEventsDbd) {
         super(scope, id, props);
 
         Queue productEventsDql = Queue.Builder.create(this, "ProductEventsDql")
@@ -57,7 +58,7 @@ public class AwsService02Stack extends Stack {
                 .taskImageOptions(
                         ApplicationLoadBalancedTaskImageOptions.builder()
                                 .containerName("java-aws-microsservices02")
-                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices02:1.3.0"))
+                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices02:2.0.0"))
                                 .containerPort(9090)
                                 .logDriver(LogDriver.awsLogs(AwsLogDriverProps.builder()
                                         .logGroup(LogGroup.Builder.create(this,"Service02LogGroup")
@@ -89,6 +90,8 @@ public class AwsService02Stack extends Stack {
                 .build());
 
         productEventsQueue.grantConsumeMessages(service02.getTaskDefinition().getTaskRole());
+        productEventsDbd.grantReadWriteData(service02.getTaskDefinition().getTaskRole());
+
 
     }
 }
