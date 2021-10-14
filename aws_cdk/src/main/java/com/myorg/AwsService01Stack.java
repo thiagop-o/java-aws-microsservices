@@ -8,16 +8,21 @@ import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskI
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.events.targets.SnsTopic;
 import software.amazon.awscdk.services.logs.LogGroup;
+import software.amazon.awscdk.services.s3.Bucket;
+import software.amazon.awscdk.services.sqs.Queue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class AwsService01Stack extends Stack {
-    public AwsService01Stack(final Construct scope, final String id, Cluster cluster, SnsTopic snsTopic) {
-        this(scope, id, null, cluster, snsTopic);
+    public AwsService01Stack(final Construct scope, final String id, Cluster cluster, SnsTopic snsTopic,
+                             Bucket bucket, Queue invoiceQueue) {
+        this(scope, id, null, cluster, snsTopic, bucket , invoiceQueue);
     }
 
-    public AwsService01Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic snsTopic) {
+    public AwsService01Stack(final Construct scope, final String id, final StackProps props, Cluster cluster,
+                             SnsTopic snsTopic, Bucket bucket, Queue invoiceQueue) {
         super(scope, id, props);
 
         Map<String, String> envVariables = new HashMap<>();
@@ -26,6 +31,8 @@ public class AwsService01Stack extends Stack {
         envVariables.put("SPRING_DATASOURCE_PASSWORD", Fn.importValue("rds-password"));
         envVariables.put("AWS_REGION", "sa-east-1");
         envVariables.put("AWS_SNS_TOPIC_PRODUCT_EVENTS_ARN", snsTopic.getTopic().getTopicArn());
+        envVariables.put("AWS_S3_BUCKET_INVOICE_NAME", bucket.getBucketName());
+        envVariables.put("AWS_SQS_QUEUE_INVOICE_EVENTS_NAME", invoiceQueue.getQueueName());
 
         // The code that defines your stack goes here
         ApplicationLoadBalancedFargateService service01 = ApplicationLoadBalancedFargateService.Builder.create(this,"ALB01")
@@ -38,7 +45,7 @@ public class AwsService01Stack extends Stack {
                 .taskImageOptions(
                         ApplicationLoadBalancedTaskImageOptions.builder()
                                 .containerName("java-aws-microsservices01")
-                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices01:2.1.0"))
+                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices01:2.3.0"))
                                 .containerPort(8080)
                                 .logDriver(LogDriver.awsLogs(AwsLogDriverProps.builder()
                                         .logGroup(LogGroup.Builder.create(this,"Service01LogGroup")
@@ -70,5 +77,7 @@ public class AwsService01Stack extends Stack {
                 .build());
 
         snsTopic.getTopic().grantPublish(service01.getTaskDefinition().getTaskRole());
+        invoiceQueue.grantConsumeMessages(service01.getTaskDefinition().getTaskRole());
+        bucket.grantReadWrite(service01.getTaskDefinition().getTaskRole());
     }
 }

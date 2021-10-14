@@ -1,6 +1,7 @@
 package com.myorg;
 
 import software.amazon.awscdk.core.App;
+import software.amazon.awscdk.services.s3.Bucket;
 
 public class AwsCdkApp {
     public static void main(final String[] args) {
@@ -17,10 +18,14 @@ public class AwsCdkApp {
 
         AwsSnsStack awsSnsStack = new AwsSnsStack(app,"Sns");
 
-        AwsService01Stack awsService01Stack = new AwsService01Stack(app, "Service01", awsClusterStack.getCluster(), awsSnsStack.getSnsTopic());
+        AwsInvoiceAppStack awsInvoiceAppStack = new AwsInvoiceAppStack(app, "InvoiceApp");
+
+        AwsService01Stack awsService01Stack = new AwsService01Stack(app, "Service01", awsClusterStack.getCluster(), awsSnsStack.getSnsTopic(),
+                awsInvoiceAppStack.getBucket(), awsInvoiceAppStack.getQueue());
         awsService01Stack.addDependency(awsClusterStack);
         awsService01Stack.addDependency(awsRdsStack);
         awsService01Stack.addDependency(awsSnsStack);
+        awsService01Stack.addDependency(awsInvoiceAppStack);
 
         AwsDynamoStack awsDynamoStack = new AwsDynamoStack(app, "Dynamo01");
 

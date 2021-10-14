@@ -58,7 +58,7 @@ public class AwsService02Stack extends Stack {
                 .taskImageOptions(
                         ApplicationLoadBalancedTaskImageOptions.builder()
                                 .containerName("java-aws-microsservices02")
-                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices02:2.0.0"))
+                                .image(ContainerImage.fromRegistry("thiagopo/java-aws-microsservices02:2.1.0"))
                                 .containerPort(9090)
                                 .logDriver(LogDriver.awsLogs(AwsLogDriverProps.builder()
                                         .logGroup(LogGroup.Builder.create(this,"Service02LogGroup")

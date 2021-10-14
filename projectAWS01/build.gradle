@@ -27,7 +27,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 bootJar {
 	baseName = 'java-aws-microsservices01'
-	version = '2.1.0'
+	version = '2.3.0'
 	mainClassName = "com.crowtech.projectAWS01.ProjectAws01Application"
 }
 
@@ -58,6 +58,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.5'
 	implementation 'mysql:mysql-connector-java:8.0.26'
 	implementation group: 'com.amazonaws', name: 'aws-java-sdk-sns', version: '1.11.887'
+	implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.887'
+	implementation group: 'com.amazonaws', name: 'aws-java-sdk-sqs', version: '1.11.887'
+	implementation group: 'com.amazonaws', name: 'amazon-sqs-java-messaging-lib', version: '1.0.8'
+	implementation group: 'org.springframework', name: 'spring-jms', version: '5.2.9.RELEASE'
 
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -28,7 +28,7 @@ sourceCompatibility = '11'
 
 bootJar {
 	baseName = 'java-aws-microsservices02'
-	version = '2.0.0'
+	version = '2.1.0'
 	mainClassName = "com.crowtech.projectAWS02.ProjectAws02Application"
 }
 

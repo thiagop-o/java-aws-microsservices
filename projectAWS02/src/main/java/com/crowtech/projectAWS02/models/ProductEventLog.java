@@ -20,7 +20,7 @@ public class ProductEventLog {
     private Long productId;
 
     @DynamoDBAttribute(attributeName = "username")
-    private String userName;
+    private String username;
 
     @DynamoDBAttribute(attributeName = "timestamp")
     private Long timestamp;
@@ -69,11 +69,11 @@ public class ProductEventLog {
     }
 
     public String getUserName() {
-        return userName;
+        return username;
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.username = userName;
     }
 
     public Long getTimestamp() {
